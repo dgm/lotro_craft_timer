@@ -18,12 +18,25 @@ local function cnt(list)
 	return n;
 end
 
+
+local function showColor(hours_remaining)
+	if hours_remaining < 0 then
+		return "00FF00"
+	elseif hours_remaining < 8 then
+		return "FFC700"
+	else
+		return "FC5555"
+	end
+end
+
+
 function showTime(hr)
 	local hrs = hr % 24;
 	local min = hr % 1;
 	min = min*60;
 	local days = math.floor(hr/24);
-	return string.format("%2i\d %02i:%02i",days,hrs,min);
+	
+	return string.format("<rgb=#" .. showColor(hr) .. ">%2i\d %02i:%02i</rgb>",days,hrs,min);
 end
 
 Event = Turbine.PluginData.Load(Turbine.DataScope.Server,"CT_Data");
@@ -64,7 +77,7 @@ function CT_Command:Execute( command,args )
             print("No active events");
             return;
         end
-		table.sort(ix);
+		table.sort(ix, function(a,b) return a > b end);
 		Turbine.Shell.WriteLine( " # Hours Description" );
 		for nr,time in ipairs(ix) do
 			hr = (time-now)/3600;
